@@ -1,3 +1,6 @@
+
+Emblue conexion
+
 This module is used in www.cremadelechealqueria.com to register user datum into www.embluemail.com platform. 
 It needs some configuration to custom use.
 
