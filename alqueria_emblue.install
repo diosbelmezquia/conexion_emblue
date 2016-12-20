@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Instrucciones de instalacion para Registro en emBlue
+ */
+
+/**
+ * Implements hook_install().
+ */
+function alqueria_emblue_install() {
+  variable_set('correo_emblue', '');
+  variable_set('pass_emblue', '');
+  variable_set('token_emblue', '');
+  variable_set('token_dinamico', '');
+  variable_set('id_grupo_emblue', '');
+}
+/**
+ * Implements hook_uninstall().
+ */
+function alqueria_emblue_uninstall() {
+  variable_del('correo_emblue');
+  variable_del('pass_emblue');
+  variable_del('token_emblue');
+  variable_del('token_dinamico');
+  variable_del('id_grupo_emblue');
+}

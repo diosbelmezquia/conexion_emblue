@@ -1,0 +1,101 @@
+<?php
+
+/**
+ * @file
+ * Este modulo guarda en la plataforma emBlue los
+ * datos del usuario registrado en el sitio.
+ *
+ * Datos del usuario a registrar en emBlue
+ * - nombre
+ * - apellido
+ * - correo
+ * - fecha de nacimiento
+ * - genero
+ * - ciudad
+ */
+ 
+include 'alqueria_emblue.inc';
+
+/**
+ * Implements hook_menu().
+ */
+function alqueria_emblue_menu() {
+  $items['admin/config/services/conexion'] = array(
+    'title' => 'Conexion a emBlue',
+    'description' => 'Establecer parametros de conexion a emBlue.',
+    'page callback' => 'drupal_get_form',
+    'page arguments'   => array('alqueria_emblue_admin'),
+    'access arguments' => array('autenticar con emBlue'),
+    'file' => 'alqueria_emblue.inc', 
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function alqueria_emblue_permission() {
+  return array(
+    'autenticar con emBlue' => array(
+      'title' => 'Autenticar con emBlue',
+      'description' => 'Establecer parametros de autenticacion con plataforma emBlue'
+    )
+  );
+}
+
+/**
+ * Implements hook_user_presave().
+ */
+function alqueria_emblue_user_presave(&$edit, $account, $category){  
+  $edit['data'] = array(     
+    'apellido' => $edit['field_apellido']['und'][0]['value'],      
+    'fecha_nacimiento' => $account->pass,  
+    'genero' => $edit['profile_main']['field_user_gender']['und'][0]['value'] == 0 ? 'M': 'F',   
+    'ciudad' => $edit['profile_main']['field_user_city']['und'][0]['value']  
+  ); 
+} 
+
+/**
+ * Implements hook_user_login().
+ */
+function alqueria_emblue_user_login(&$edit, $account) {
+  //Si hay datos adicionales guardados del usuario, y son los datos necesarios...
+  if(!empty($account->data) && isset($account->data['ciudad'])) {
+    //Obtener datos de registro del usuario
+    $nombre = $account->field_user_name['und'][0]['value'];
+    $email = $account->mail;
+    $apellido = $account->data['apellido']; 
+    $fecha_nacimiento = $account->data['fecha_nacimiento']; 
+    $genero = $account->data['genero']; 	     
+    $ciudad = $account->data['ciudad'];
+
+    //Array para guardar los datos del usuario
+    $datos_usuario = array($nombre, $apellido, $fecha_nacimiento, $genero, $ciudad);
+
+    //Obtener Token dinamico
+    $token_dinamico = variable_get('token_dinamico');
+    $id_grupo_emblue = variable_get('id_grupo_emblue');
+
+      //Si la conexion con emBlue es correcta...
+      if ($token_dinamico && alqueria_emblue_conexion($token_dinamico)) {
+        //Registrar datos del usuario en el grupo seleccionado por el administrador
+        alqueria_emblue_agregar_usuario($token_dinamico, $email, $id_grupo_emblue, $datos_usuario);
+      }
+      else {
+        //Volver a autenticar para generar token dinamico valido
+        $correo_emblue = variable_get('correo_emblue');
+        $pass_emblue = variable_get('pass_emblue');
+        $token_emblue = variable_get('token_emblue');
+
+        //Token dinamico nuevo generado, el anterior caduco, pasaron +30 min
+        $token_dinamico = alqueria_emblue_autenticar($correo_emblue, $pass_emblue, $token_emblue);
+        //Si la conexion con emBlue es correcta...
+          if (alqueria_emblue_conexion($token_dinamico)) {
+            //Actualizar token dinamico por el nuevo
+             variable_set('token_dinamico', $token_dinamico);
+            //Registrar datos del usuario en el grupo seleccionado por el administrador
+            alqueria_emblue_agregar_usuario($token_dinamico, $email, $id_grupo_emblue, $datos_usuario);
+          }
+      }
+   }
+}

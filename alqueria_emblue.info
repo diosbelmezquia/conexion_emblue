@@ -1,0 +1,12 @@
+name = Registro en emBlue
+description = Registrar usuario de alqueria en la plataforma emBlue
+package = Alqueria_emBlue
+core = 7.x
+configure = admin/config/services/conexion
+
+; Information added by Drupal.org packaging script on 2015-12-29
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "registro"
+datestamp = "1448423960"
+
