@@ -8,12 +8,12 @@ It needs some configuration to custom use.
 This module saves the data of the logged user on the site.
 
 User data to register on emBlue
-- nombre
-- apellido
-- correo
-- fecha de nacimiento
-- genero
-- ciudad
+> - nombre
+> - apellido
+> - correo
+> - fecha de nacimiento
+> - genero
+> - ciudad
 
 See register form at www.cremadelechealqueria.com/user/register
  
