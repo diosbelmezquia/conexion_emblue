@@ -1,5 +1,5 @@
 name = Registro en emBlue
-description = Registrar usuario de alqueria en la plataforma emBlue
+description = Registrar usuario de alqueria en la plataforma emBlue.
 package = Alqueria_emBlue
 core = 7.x
 configure = admin/config/services/conexion
